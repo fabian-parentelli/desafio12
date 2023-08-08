@@ -6,7 +6,7 @@ const getMocksProductsService = async () => {
     for (let i = 0; i < 100; i++) {
         products.push(generateProducts());
     };
-    return { status: 'success', payload: products }
+    return { status: 'success', payload: products };
 };
 
 const saveMocksProductsService = async (product) => {

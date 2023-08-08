@@ -10,4 +10,4 @@ form.addEventListener('submit', async (e) => {
     });
     const data = await response.json();
     localStorage.setItem('token', data.data.accesToken);
-})
+});

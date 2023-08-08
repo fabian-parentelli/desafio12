@@ -42,7 +42,7 @@ const recoverPassword = async (req, res) => {
         if (!result) return res.sendClientError('user not found');
         res.sendSuccess(result);
     } catch (error) {
-        // logger.error(error.message);
+        logger.error(error.message);
         res.sendServerError(error.message);
     };
 };

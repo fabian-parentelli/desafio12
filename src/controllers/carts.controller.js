@@ -1,5 +1,6 @@
 import * as cartService from '../services/carts.service.js';
 import { logger } from '../middlewares/loggs/logger.js';
+import { CartNotFound } from '../utils/custom-exceptions.js';
 
 const createCart = async (req, res) => {
     try {
@@ -18,6 +19,7 @@ const getByIdCart = async (req, res) => {
         res.sendSuccess(result);
     } catch (error) {
         logger.error(error.message);
+        if (error instanceof CartNotFound) res.sendClientError(error.message);
         res.sendServerError(error.message);
     };
 };
@@ -30,6 +32,7 @@ const productToCart = async (req, res) => {
         res.sendSuccess(result);
     } catch (error) {
         logger.error(error.message);
+        if (error instanceof CartNotFound) res.sendClientError(error.message);
         res.sendServerError(error.message);
     };
 };
@@ -42,6 +45,7 @@ const removeProduct = async (req, res) => {
         res.sendSuccess(result);
     } catch (error) {
         logger.error(error.message);
+        if (error instanceof CartNotFound) res.sendClientError(error.message);
         res.sendServerError(error.message);
     };
 };
@@ -54,6 +58,7 @@ const modifyCart = async (req, res) => {
         res.sendSuccess(result);
     } catch (error) {
         logger.error(error.message);
+        if (error instanceof CartNotFound) res.sendClientError(error.message);
         res.sendServerError(error.message);
     };
 };
@@ -66,6 +71,7 @@ const modifyQuantity = async (req, res) => {
         res.sendSuccess(result);
     } catch (error) {
         logger.error(error.message);
+        if (error instanceof CartNotFound) res.sendClientError(error.message);
         res.sendServerError(error.message);
     };
 };
@@ -77,6 +83,7 @@ const eliminateAllProducts = async (req, res) => {
         res.sendSuccess(result);
     } catch (error) {
         logger.error(error.message);
+        if (error instanceof CartNotFound) res.sendClientError(error.message);
         res.sendServerError(error.message);
     };
 };
@@ -87,18 +94,28 @@ const purchase = async (req, res) => {
     try {
         const result = await cartService.purchase(cid, user);
 
-        if(result.outStock.length < 1) {
-            res.sendSuccess({status: 'Purchase completed', result});
-        } else if(result.outStock.length >= 1) {
-            res.sendSuccess({status: 'Partially completed purchase', result});
+        if (result.outStock.length < 1) {
+            res.sendSuccess({ status: 'Purchase completed', result });
+        } else if (result.outStock.length >= 1) {
+            res.sendSuccess({ status: 'Partially completed purchase', result });
         } else {
             res.sendClientError(result)
         };
 
     } catch (error) {
         logger.error(error.message);
+        if (error instanceof CartNotFound) res.sendClientError(error.message);
         res.sendServerError(error.message);
     };
 };
 
-export { createCart, getByIdCart, productToCart, removeProduct, modifyCart, modifyQuantity, eliminateAllProducts, purchase };
+export { 
+    createCart, 
+    getByIdCart, 
+    productToCart, 
+    removeProduct, 
+    modifyCart, 
+    modifyQuantity, 
+    eliminateAllProducts, 
+    purchase 
+};

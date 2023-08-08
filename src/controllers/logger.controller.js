@@ -1,6 +1,4 @@
-
 const getallLogger = (req, res) => {
-
     req.logger.fatal('Prueba Fatal')
     req.logger.error('Prueba Error');
     req.logger.warning('Prueba Warning');

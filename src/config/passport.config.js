@@ -12,9 +12,9 @@ const initializePassport = () => {
     passport.use('jwt', new JWTStrategy({
         jwtFromRequest: EXTRACTJWT.fromAuthHeaderAsBearerToken(),
         secretOrKey: config.privateKey
-    }, async(jwt_payload, done) => {
+    }, async (jwt_payload, done) => {
         try {
-                return done(null, jwt_payload);
+            return done(null, jwt_payload);
         } catch (error) {
             return done(error);
         };

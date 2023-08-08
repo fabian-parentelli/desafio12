@@ -1,6 +1,7 @@
 import CartRepository from '../repsitories/carts.repository.js';
 import ProductRepository from '../repsitories/products.repository.js';
 import { save } from './tickets.service.js';
+import { CartNotFound } from '../utils/custom-exceptions.js';
 
 const cartManager = new CartRepository();
 const productManager = new ProductRepository();
@@ -12,68 +13,56 @@ const saveCart = async () => {
 
 const getByIdCarts = async (id) => {
     const cart = await cartManager.getById(id);
-    return cart ? cart : { status: 'error', error: 'Cart not found' };
+    if (!cart) throw new CartNotFound('Cart not found');
+    return cart;
 };
 
 const addProductToCarts = async (cid, pid) => {
-    try {
-        const preCart = await cartManager.getById(cid);
-        const product = await productManager.getById(pid);
-        const cart = preCart[0];
+    const preCart = await cartManager.getById(cid);
+    const product = await productManager.getById(pid);
+    const cart = preCart[0];
 
-        const exist = cart.products.findIndex(pro => pro.product._id.toString() === product._id.toString());
+    const exist = cart.products.findIndex(pro => pro.product._id.toString() === product._id.toString());
 
-        if (exist !== -1) {
-            cart.products[exist].quantity++;
-        } else {
-            cart.products.push({ product: product._id });
-        };
-        const result = await cartManager.addProductToCart(cid, cart);
-        return result ? result : { status: 'error', error: 'Cart not found' };
-    } catch (error) {
-        console.error(error);
+    if (exist !== -1) {
+        cart.products[exist].quantity++;
+    } else {
+        cart.products.push({ product: product._id });
     };
+
+    const result = await cartManager.addProductToCart(cid, cart);
+    if (!result) throw new CartNotFound('Cart not found');
+    return result;
 };
 
 const deleteProduct = async (cid, pid) => {
-    try {
-        const result = await cartManager.deleteProduct(cid, pid);
-        return result ? result : { status: 'error', error: 'Cart not found' };
-    } catch (error) {
-        console.error(error);
-    };
+    const result = await cartManager.deleteProduct(cid, pid);
+    if (!result) throw new CartNotFound('Cart not found');
+    return result;
 };
 
 const updateProduct = async (cid, product) => {
-    try {
-        const result = await cartManager.updateProductsDao(cid, product);
-        return result ? result : { status: 'error', error: 'Cart not found' };
-    } catch (error) {
-        console.error(error);
-    };
+    const result = await cartManager.updateProductsDao(cid, product);
+    if (!result) throw new CartNotFound('Cart not found');
+    return result;
 };
 
 const updateQuantity = async (cid, pid, quantity) => {
-    try {
-        const result = await cartManager.updateQuantityDao(cid, pid, quantity);
-        return result ? result : { status: 'error', error: 'Cart not found' };
-    } catch (error) {
-        console.error(error);
-    };
+    const result = await cartManager.updateQuantityDao(cid, pid, quantity);
+    if (!result) throw new CartNotFound('Cart not found');
+    return result;
 };
 
 const deleteAllProducts = async (cid) => {
-    try {
-        const result = await cartManager.deleteAllProductDao(cid);
-        return result ? result : { status: 'error', error: 'Cart not found' };
-    } catch (error) {
-        console.error(error);
-    };
+    const result = await cartManager.deleteAllProductDao(cid);
+    if (!result) throw new CartNotFound('Cart not found');
+    return result;
 };
 
 const purchase = async (cid, user) => {
 
     const preCart = await cartManager.getById(cid);
+    if (!preCart) throw new CartNotFound('Cart not found');
     const cart = preCart.pop();
 
     if (cart.products.length > 0) {
@@ -93,11 +82,20 @@ const purchase = async (cid, user) => {
         if (amount > 0) {
             const ticket = await save(user, amount);
             const payload = await cartManager.updateProductsDao(cid, outStock);
-            return { ticket, payload, outStock }
+            return { ticket, payload, outStock };
         } else {
             return { status: 'error', outStock };
-        }
+        };
     };
 };
 
-export { saveCart, getByIdCarts, addProductToCarts, deleteProduct, updateProduct, updateQuantity, deleteAllProducts, purchase };
+export { 
+    saveCart, 
+    getByIdCarts, 
+    addProductToCarts, 
+    deleteProduct, 
+    updateProduct, 
+    updateQuantity, 
+    deleteAllProducts, 
+    purchase 
+};

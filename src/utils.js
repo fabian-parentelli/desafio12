@@ -6,5 +6,4 @@ const __dirname = dirname(__filename);
 
 export {
     __dirname,
-
 }; 
